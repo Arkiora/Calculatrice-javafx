@@ -1,6 +1,3 @@
-Réflexion durant une seconde
-
-
 # TP JavaFX – Calculatrice & Liste Utilisateurs MySQL
 
 Ce projet contient deux parties :
