@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="fr.bts.sio.tp_calculatrice.UserController"
+      spacing="10" alignment="CENTER" prefWidth="600" prefHeight="400">
+
+    <TableView fx:id="tableView" prefHeight="350" prefWidth="700">
+        <columns>
+            <TableColumn text="ID"          fx:id="colId"          prefWidth="50"/>
+            <TableColumn text="Nom"         fx:id="colNom"         prefWidth="150"/>
+            <TableColumn text="Email"       fx:id="colEmail"       prefWidth="200"/>
+            <TableColumn text="Département" fx:id="colDepartement" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+    <Button text="Détails…" onAction="#onDetailClicked"/>
+</VBox>
