@@ -1,6 +1,3 @@
-Réflexion durant quelques secondes
-
-
 ````markdown
 # TP JavaFX – Calculatrice & TableView MySQL
 
