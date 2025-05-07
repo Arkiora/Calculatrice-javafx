@@ -1,143 +1,160 @@
-````markdown
-# TP JavaFX – Calculatrice & TableView MySQL
+Réflexion durant une seconde
 
-Ce projet JavaFX, structuré en deux parties, illustre :
-1. **Partie 1 – Calculatrice** : une simple application JavaFX pour effectuer des opérations arithmétiques  
-2. **Partie 2 – TableView + MySQL** : affichage d’une liste d’utilisateurs stockés dans une base MySQL
+
+# TP JavaFX – Calculatrice & Liste Utilisateurs MySQL
+
+Ce projet contient deux parties :
+
+1. **Calculatrice JavaFX** (Partie 1)
+2. **TableView JavaFX + MySQL** (Partie 2), affichant le contenu de la table `user_info`
 
 ---
 
 ## 📋 Prérequis
 
-- Java 23 (OpenJDK ou Oracle)  
-- Maven 3.x  
-- JavaFX 21 (les dépendances sont gérées par Maven)  
-- (Optionnel) JavaFX SDK 21 pour l’édition FXML dans l’IDE  
-- MySQL 8.x pour la Partie 2  
+* Java 23 (OpenJDK ou Oracle)
+* Maven wrapper (`mvnw.cmd` fourni)
+* JavaFX 21 (géré par Maven)
+* MySQL 8.x
 
 ---
 
-## 🚀 Installation & exécution
+## 🚀 Installer & Exécuter
 
-1. **Cloner le dépôt**  
-   ```bash
-   git clone <URL_DU_PROJET>
-   cd tp_calculatrice
-````
-
-2. **Compiler & lancer la calculatrice (Partie 1)**
-
-   ```bash
-   mvn clean javafx:run
-   ```
-
-3. **Importer la base MySQL (Partie 2)**
-
-   ```sql
-   CREATE DATABASE IF NOT EXISTS bts_sio;
-   USE bts_sio;
-   SOURCE users.sql;
-   ```
-
-   – ou depuis l’invite :
-
-   ```bash
-   mysql -u root -p bts_sio < users.sql
-   ```
-
-4. **Compiler & lancer l’application Utilisateurs**
-
-    * Créer la classe `UserApp.java` (voir section “Intégration Partie 2”)
-    * Puis :
-
-      ```bash
-      mvn clean javafx:run -DmainClass=fr.bts.sio.tp_calculatrice.UserApp
-      ```
+1. Cloner / ouvrir ce projet
+2. Définir `JAVA_HOME` sur votre JDK 23
+3. Reload Maven (IntelliJ : icône ⟳ dans le panneau Maven)
 
 ---
 
-## 📂 Structure du projet
+## Partie 1 – Calculatrice
 
-```
-tp_calculatrice/
-├─ pom.xml
-├─ users.sql             # dump MySQL (Partie 2)
-├─ src/
-│  ├─ main/
-│  │  ├─ java/
-│  │  │   ├─ module-info.java
-│  │  │   └─ fr/bts/sio/tp_calculatrice/
-│  │  │       ├─ CalculatriceFX.java
-│  │  │       ├─ CalculatorController.java
-│  │  │       ├─ DbConnection.java         # Partie 2
-│  │  │       ├─ Utilisateur.java          # Partie 2
-│  │  │       ├─ UserController.java       # Partie 2
-│  │  │       └─ DetailsUtilisateur.java   # Partie 2
-│  │  └─ resources/
-│  │      └─ fr/bts/sio/tp_calculatrice/
-│  │          └─ view/
-│  │              ├─ calculatrice.fxml
-│  │              ├─ myCSS.css
-│  │              └─ users.fxml             # Partie 2
-└─ README.md
+Pour lancer la calculatrice :
+
+```bash
+.\mvnw.cmd clean javafx:run
 ```
 
----
+**Classes clés**
 
-## 📖 Partie 1 – Calculatrice JavaFX
-
-* **pom.xml** utilise le plugin `javafx-maven-plugin` pour lancer l’application
-* **module-info.java**
-
-  ```java
-  module tp_calculatrice {
-      requires javafx.controls;
-      requires javafx.fxml;
-      opens fr.bts.sio.tp_calculatrice to javafx.fxml;
-      opens fr.bts.sio.tp_calculatrice.view to javafx.fxml;
-      exports fr.bts.sio.tp_calculatrice;
-  }
-  ```
-* **CalculatriceFX.java** : classe `Application` chargeant `calculatrice.fxml`
-* **CalculatorController.java** : gère les clics chiffres/opérateurs/égal/clear
-* **calculatrice.fxml** : `GridPane` 4×5, `TextField` + Buttons
-* **myCSS.css** : style minimal (taille, padding, hover)
+* `CalculatriceFX` : launcher JavaFX
+* `CalculatorController` : gestion des boutons
+* `calculatrice.fxml` + `myCSS.css`
 
 ---
 
-## 🛠 Partie 2 – TableView & MySQL
+## Partie 2 – Liste Utilisateurs
 
-1. **DbConnection.java**
+### 1. Préparer la base MySQL
 
-    * Singleton JDBC (`jdbc:mysql://localhost:3306/bts_sio`)
-2. **Utilisateur.java**
+```sql
+CREATE DATABASE IF NOT EXISTS bts_sio;
+USE bts_sio;
+-- Importer votre dump users.sql
+SOURCE users.sql;
+```
 
-    * POJO JavaFX avec `IntegerProperty` et `StringProperty`
-3. **users.fxml**
+### 2. Configuration JDBC
 
-    * `TableView<Utilisateur>` + colonnes ID, Nom, Prénom, Email + bouton “Détails…”
-4. **UserController.java**
+* **DbConnection.java**
+  Singleton JDBC pour `jdbc:mysql://localhost:3306/bts_sio`
 
-    * Chargement des données depuis MySQL → `ObservableList` → `tableView.setItems(...)`
-    * Méthode `onDetailClicked` ouvre une alerte avec **DetailsUtilisateur.show(u)**
-5. **DetailsUtilisateur.java**
+### 3. Entité `Utilisateur`
 
-    * Affiche un `Alert` JavaFX montrant les propriétés de l’utilisateur sélectionné
+```java
+public class Utilisateur {
+  private IntegerProperty id;
+  private StringProperty  name, email, departement;
+  // idProperty(), nameProperty(), emailProperty(), departementProperty()
+}
+```
+
+### 4. Vue FXML et contrôleur
+
+* **users.fxml** : `TableView` avec colonnes
+  ID, Nom, Email, Département
+* **UserController.java**
+
+  * `SELECT ID, name, email, departement FROM user_info`
+  * Remplit un `ObservableList<Utilisateur>`
+  * Bouton **Détails…** ouvre `DetailsUtilisateur`
+
+### 5. Détails utilisateur
+
+* **DetailsUtilisateur.java** :
+  Affiche un `Alert` avec
+  ID, Email, Département
+
+### 6. Launcher `UserApp`
+
+Pour lancer :
+
+```bash
+.\mvnw.cmd clean -DmainClass=fr.bts.sio.tp_calculatrice.UserApp javafx:run
+```
+
+ou modifier `<mainClass>` dans `pom.xml` sur `UserApp` et simplement :
+
+```bash
+.\mvnw.cmd clean javafx:run
+```
 
 ---
 
-## 🔧 Personnalisation & extensions possibles
+## 🛠 POM & compilation
 
-* **Calculatrice**
+Le projet compile **sur le classpath**, sans **module-info.java**, grâce à cette configuration Maven :
 
-    * Gestion de la virgule, raccourcis clavier, historique
-* **TableView**
+```xml
+<properties>
+  <maven.compiler.release>23</maven.compiler.release>
+  <javafx.version>21</javafx.version>
+</properties>
 
-    * Recherche, filtres, édition inline, pagination
-* **UX**
+<dependencies>
+  <!-- JavaFX -->
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-controls</artifactId>
+    <version>${javafx.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-fxml</artifactId>
+    <version>${javafx.version}</version>
+  </dependency>
 
-    * Menu principal pour basculer entre “Calculatrice” et “Utilisateurs”
-    * Bundle de propriétés pour i18n (FR/EN)
+  <!-- MySQL connector -->
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <!-- Lance l’app JavaFX -->
+    <plugin>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-maven-plugin</artifactId>
+      <version>0.0.8</version>
+      <configuration>
+        <mainClass>fr.bts.sio.tp_calculatrice.CalculatriceFX</mainClass>
+      </configuration>
+    </plugin>
+
+    <!-- Compilation sur classpath -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.8.1</version>
+      <configuration>
+        <release>${maven.compiler.release}</release>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
 
 ---
-
